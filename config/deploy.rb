@@ -1,12 +1,16 @@
 set :application, "rptiv"
+
 set :repository,  "https://github.com/yanatan16/RaspberryPiTV"
 set :deploy_to, '/home/pi/app'
 set :strategy, 'copy'
-
 set :scm, :git
-set :user, 'pi'
+set :branch, 'test'
 
 server "rpitv-jon", :app
+set :user, 'pi'
+
+
+
 
 namespace :deploy do
 
