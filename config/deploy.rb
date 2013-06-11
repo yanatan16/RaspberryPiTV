@@ -1,18 +1,19 @@
 set :application, "rptiv"
+
 set :repository,  "https://github.com/yanatan16/RaspberryPiTV"
 set :deploy_to, '/home/pi/app'
-set :strategy, 'copy'
-
+set :deploy_via, :copy
 set :scm, :git
-set :user, 'pi'
+set :branch, 'test'
 
 server "rpitv-jon", :app
+set :user, 'pi'
 
 namespace :deploy do
 
 	namespace :node do
 		task :stop, :roles => :app, :except => { :no_release => true } do
-			sudo "/etc/init.d/nodejs.sh stop"
+			sudo "/etc/init.d/nodejs.sh stop" rescue nil
 		end
 
 		task :start, :roles => :app, :except => { :no_release => true } do
@@ -22,6 +23,6 @@ namespace :deploy do
 
 	task :restart, :roles => :app, :except => { :no_release => true } do
 		node.stop
-		node.stop
+		node.start
 	end
 end
