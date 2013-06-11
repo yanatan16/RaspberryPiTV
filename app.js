@@ -4,7 +4,7 @@
  */
 
 var express = require('express')
-  , app = express()  
+  , app = express()
   , server = require('http').createServer(app)
   , path = require('path')
   , io = require('socket.io').listen(server)

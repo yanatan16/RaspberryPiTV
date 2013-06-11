@@ -15,12 +15,12 @@ namespace :deploy do
 	namespace :node do
 	  desc "Stop Forever"
 	  task :stop do
-	    run "sudo forever stopall"
+	    run "sudo forever stopall" rescue nil
 	  end
 
 	  desc "Start Forever"
 	  task :start do
-	    run "cd #{current_path} && sudo forever start server.js"
+	    run "cd #{current_path} && sudo forever start start -a forever.log -o out.log -e err.log app.js"
 	  end
 
 	  desc "Restart Forever"
