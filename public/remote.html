@@ -7,12 +7,12 @@
 	<link href="css/style.css" rel="stylesheet" type="text/css">
 	<link rel="apple-touch-icon" href="images/custom_icon.png"/>
 	<link rel="apple-touch-startup-image" href="images/startup.png">
-	
+
 	<meta name="viewport" content="width=device-width initial-scale=1, maximum-scale=1, user-scalable=no" />
 	<meta name="apple-mobile-web-app-title" content="Remote">
 	<meta name="apple-mobile-web-app-capable" content="yes">
-	
-	
+
+
 </head>
 <body>
 	<div class="r-container ">
@@ -40,9 +40,9 @@
 			</div>
 		<section class="slider">
 			<div class="list-wrapper">
-		
+
 					<ul class="video slides list-pres span4" style="display: block;">
-						
+
 					</ul>
 			</div>
 		</section>
@@ -53,20 +53,20 @@
 	<script src="js/jquery.flexslider.js"></script>
 	<script src="js/quo.js"></script>
 	<script src="js/mustache.js"></script>
-	
-	<script>	 
-		
-	  	var socket = io.connect('http://192.168.0.102:8080'); 
-	  //var socket = io.connect('http://raspberrypi.local:8080/');
+
+	<script>
+
+	  	var socket = io.connect('http://rpitv-jon:8080');
+
 	    socket.on('connect', function(data){
 	  	socket.emit('remote');
-	  	
+
 	  	//Youtube
 	  	  var Youtube = {
 	  		  	getVideo: function(query, socket){
 	  			  	var max_videos = 12;
 	  			  	var url = "http://gdata.youtube.com/feeds/api/videos?vq=" + escape(query) + "&max-results=" + max_videos + "&alt=json-in-script&callback=?";
-	  			  	
+
 	  			  	$.getJSON(url, function(data){
 	  				  	$("ul.video").html("");
 	  				  	var jsonObj = [];
@@ -79,65 +79,65 @@
 	  				  			hours = parseInt( totalSec / 3600 ) % 24,
 	  				  			minutes = parseInt( totalSec / 60 ) % 60,
 	  				  			seconds = totalSec % 60;
-	  				  		
+
 	  				  		var duration = (hours < 10 ? "0" + hours : hours) + ":" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds  < 10 ? "0" + seconds : seconds);
-	  				  		
-	  				  		
+
+
 	  				  		jsonObj = {
 	  					  		id:id,
 	  					  		title:title,
 	  					  		thumbnail:thumbnail,
 	  					  		duration:duration};
-	  					  		
-	  				  		
+
+
 	  				  		var template = $('#videoTpl').html(),
 	  				  			html = Mustache.to_html(template, jsonObj);
-	  				  		$('ul.video').append(html);	
-	  				  			
+	  				  		$('ul.video').append(html);
+
 	  			  		});
 	  			  		$(".watch").on("click",function(){
 		  			  		var video_id = $(this).data('id');
 							socket.emit('video',{action:"play", video_id:video_id});
 	  			  		});
 	  			  	});
-	  			  		
+
 	  		  	}
-	  	  }		
-	  	
+	  	  }
+
 		$$(".r-container").swipeLeft(function(){
-			socket.emit('controll',{action:"swipeLeft"}); 
+			socket.emit('controll',{action:"swipeLeft"});
 		});
-		
+
 		$$(".r-container").swipeRight(function(){
-			socket.emit('controll',{action:"swipeRight"}); 
+			socket.emit('controll',{action:"swipeRight"});
 		});
 		$$(".r-header").tap(function(){
-			socket.emit('controll',{action:"tap"}); 
-			$(".app-body").fadeToggle("fast", function () {});	
-			$.get('http://192.168.0.102:8080/omx/quit',function(data){
+			socket.emit('controll',{action:"tap"});
+			$(".app-body").fadeToggle("fast", function () {});
+			$.get('http://rpitv-jon:8080/omx/quit',function(data){
 				console.log(data);
 			});
 		});
 		$$(".app-body").tap(function(){
-			$.get('http://192.168.0.102:8080/omx/pause',function(data){
+			$.get('http://rpitv-jon:8080/omx/pause',function(data){
 				console.log(data);
 			});
 		});
 		$(".search input").change(function() {
 			Youtube.getVideo($(this).val(), socket);
 		 });
-		 
+
 		 socket.on("loading", function(data){
 			 console.log(data);
-		 })	  
+		 })
 	  });
-	
+
 	</script>
-	
+
 	<script id="videoTpl" type="text/template">
 		<li class="block">
 			<div class="tile">
-				<img class="tile-image big-illustration" src="{{thumbnail}}"/>			
+				<img class="tile-image big-illustration" src="{{thumbnail}}"/>
 				<h3 class="tile-title">{{title}}</h3>
 				<p>Duration: {{duration}}</p>
 				<a class="btn button btn-primary btn-large btn-block watch" data-id={{id}}>Watch</a>

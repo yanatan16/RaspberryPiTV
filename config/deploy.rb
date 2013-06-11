@@ -2,27 +2,53 @@ set :application, "rptiv"
 
 set :repository,  "https://github.com/yanatan16/RaspberryPiTV"
 set :deploy_to, '/home/pi/app'
-set :deploy_via, :copy
 set :scm, :git
-set :branch, 'test'
+set :branch, 'master'
 
 server "rpitv-jon", :app
 set :user, 'pi'
 
+set :public_children, ['css', 'font', 'images', 'js']
+
 namespace :deploy do
 
 	namespace :node do
-		task :stop, :roles => :app, :except => { :no_release => true } do
-			sudo "/etc/init.d/nodejs.sh stop" rescue nil
-		end
+	  desc "Stop Forever"
+	  task :stop do
+	    run "sudo forever stopall"
+	  end
 
-		task :start, :roles => :app, :except => { :no_release => true } do
-			sudo "/etc/init.d/nodejs.sh start"
-		end
+	  desc "Start Forever"
+	  task :start do
+	    run "cd #{current_path} && sudo forever start server.js"
+	  end
+
+	  desc "Restart Forever"
+	  task :restart do
+	    stop
+	    sleep 5
+	    start
+	  end
 	end
 
+	desc "Restart the app"
 	task :restart, :roles => :app, :except => { :no_release => true } do
-		node.stop
-		node.start
+		node.restart
 	end
+
+	desc "Refresh the npm install"
+	task :finalize_update do
+		refresh_symlink
+		npm_install
+	end
+
+  desc "Refresh shared node_modules symlink to current node_modules"
+  task :refresh_symlink do
+    run "rm -rf #{current_path}/node_modules && ln -s #{shared_path}/node_modules #{current_path}/node_modules"
+  end
+
+  desc "Install node modules non-globally"
+  task :npm_install do
+    run "cd #{current_path} && npm install"
+  end
 end
